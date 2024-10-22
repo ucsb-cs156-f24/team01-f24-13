@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface MenuItemReviewRepository extends CrudRepository<MenuItemReview, Long> {
   /**
    * This method returns all UCSBDate entities with a given quarterYYYYQ.
-   * @param itemId quarter in the format YYYYQ (e.g. 20241 for Winter 2024, 20242 for Spring 2024, 20243 for Summer 2024, 20244 for Fall 2024)
+   * @param itemId refers to the id of some menu item 
    * @return all UCSBDate entities with a given quarterYYYYQ
    */
   Iterable<MenuItemReview> findAllByItemId(long itemId);
