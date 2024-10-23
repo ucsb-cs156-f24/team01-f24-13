@@ -1,7 +1,7 @@
 package edu.ucsb.cs156.example.controllers;
 
 import edu.ucsb.cs156.example.entities.MenuItemReview;
-import edu.ucsb.cs156.example.entities.UCSBDate;
+import edu.ucsb.cs156.example.entities.MenuItemReview;
 import edu.ucsb.cs156.example.errors.EntityNotFoundException;
 import edu.ucsb.cs156.example.repositories.MenuItemReviewRepository;
 
@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 
 /**
- * This is a REST controller for UCSBDates
+ * This is a REST controller for MenuItemReviews
  */
 
 @Tag(name = "MenuItemReview")
@@ -127,6 +127,34 @@ public class MenuItemReviewController extends ApiController {
 
         return savedReview;
 
+    }
+
+    /**
+     * Update a single review
+     * 
+     * @param id       id of the review to update
+     * @param incoming the new review
+     * @return the updated review object
+     */
+    @Operation(summary= "Update a single review")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public MenuItemReview updateMenuItemReview(
+            @Parameter(name="id") @RequestParam Long id,
+            @RequestBody @Valid MenuItemReview incoming) {
+
+        MenuItemReview menuItemReview = menuItemReviewRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MenuItemReview.class, id));
+
+        menuItemReview.setItemId(incoming.getItemId());
+        menuItemReview.setReviewerEmail(incoming.getReviewerEmail());
+        menuItemReview.setComments(incoming.getComments());
+        menuItemReview.setDateReviewed(incoming.getDateReviewed());
+        menuItemReview.setStars(incoming.getStars());
+
+        menuItemReviewRepository.save(menuItemReview);
+
+        return menuItemReview;
     }
 
 }

@@ -238,6 +238,56 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
                 assertEquals("MenuItemReview with id 15 deleted", json.get("message"));
         }
 
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void regular_user_cannot_delete_a_review() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                MenuItemReview menuItemReview1 = MenuItemReview.builder()
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
+                                .build();
+
+                when(menuItemReviewRepository.findById(eq(15L))).thenReturn(Optional.of(menuItemReview1));
+
+                // act
+                mockMvc.perform(
+                                delete("/api/menuitemreview?id=15")
+                                                .with(csrf()))
+                                .andExpect(status().is(403)).andReturn();
+
+        }
+
+        @Test
+        public void logged_out_user_cannot_delete_a_review() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                MenuItemReview menuItemReview1 = MenuItemReview.builder()
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
+                                .build();
+
+                when(menuItemReviewRepository.findById(eq(15L))).thenReturn(Optional.of(menuItemReview1));
+
+                // act
+                mockMvc.perform(
+                                delete("/api/menuitemreview?id=15")
+                                                .with(csrf()))
+                                .andExpect(status().is(403)).andReturn();
+
+        }
+
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_tries_to_delete_non_existant_menuitemreview_and_gets_right_error_message()
@@ -257,25 +307,29 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("MenuItemReview with id 15 not found", json.get("message"));
         }
-        /* 
+        
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_edit_an_existing_ucsbdate() throws Exception {
+        public void admin_can_edit_an_existing_menuitemreview() throws Exception {
                 // arrange
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
                 LocalDateTime ldt2 = LocalDateTime.parse("2023-01-03T00:00:00");
 
                 MenuItemReview menuItemReviewOrig = MenuItemReview.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt1)
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
                                 .build();
 
                 MenuItemReview menuItemReviewEdited = MenuItemReview.builder()
-                                .name("firstDayOfFestivus")
-                                .quarterYYYYQ("20232")
-                                .localDateTime(ldt2)
+                                .itemId(2)
+                                .reviewerEmail("jshiu@ucsb.edu")
+                                .stars(0)
+                                .dateReviewed(ldt2)
+                                .comments("not fire")
                                 .build();
 
                 String requestBody = mapper.writeValueAsString(menuItemReviewEdited);
@@ -300,15 +354,17 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_cannot_edit_ucsbdate_that_does_not_exist() throws Exception {
+        public void admin_cannot_edit_menuitemreview_that_does_not_exist() throws Exception {
                 // arrange
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 MenuItemReview ucsbEditedDate = MenuItemReview.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt1)
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
                                 .build();
 
                 String requestBody = mapper.writeValueAsString(ucsbEditedDate);
@@ -330,5 +386,65 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
                 assertEquals("MenuItemReview with id 67 not found", json.get("message"));
 
         }
-                */
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void regular_user_cannot_edit_menuitemreview() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                MenuItemReview ucsbEditedDate = MenuItemReview.builder()
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
+                                .build();
+
+                String requestBody = mapper.writeValueAsString(ucsbEditedDate);
+
+                when(menuItemReviewRepository.findById(eq(67L))).thenReturn(Optional.empty());
+
+                // act
+                mockMvc.perform(
+                        put("/api/menuitemreview?id=67")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                        .andExpect(status().is(403)).andReturn();
+
+        }
+
+        @Test
+        public void logged_out_user_cannot_edit_menuitemreview() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                MenuItemReview ucsbEditedDate = MenuItemReview.builder()
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
+                                .build();
+
+                String requestBody = mapper.writeValueAsString(ucsbEditedDate);
+
+                when(menuItemReviewRepository.findById(eq(67L))).thenReturn(Optional.empty());
+
+                // act
+                mockMvc.perform(
+                        put("/api/menuitemreview?id=67")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                        .andExpect(status().is(403)).andReturn();
+
+        }
+
+        
 }
