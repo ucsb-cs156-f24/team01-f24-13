@@ -206,18 +206,20 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
         }
 
         // not impl yet
-        /* 
+        
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_delete_a_date() throws Exception {
+        public void admin_can_delete_a_review() throws Exception {
                 // arrange
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 MenuItemReview menuItemReview1 = MenuItemReview.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt1)
+                                .itemId(1)
+                                .reviewerEmail("dqiao@ucsb.edu")
+                                .stars(5)
+                                .dateReviewed(ldt1)
+                                .comments("fire")
                                 .build();
 
                 when(menuItemReviewRepository.findById(eq(15L))).thenReturn(Optional.of(menuItemReview1));
@@ -238,7 +240,7 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_tries_to_delete_non_existant_ucsbdate_and_gets_right_error_message()
+        public void admin_tries_to_delete_non_existant_menuitemreview_and_gets_right_error_message()
                         throws Exception {
                 // arrange
 
@@ -255,7 +257,7 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("MenuItemReview with id 15 not found", json.get("message"));
         }
-
+        /* 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_can_edit_an_existing_ucsbdate() throws Exception {
