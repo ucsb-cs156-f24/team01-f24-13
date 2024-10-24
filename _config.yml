@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-f24/team01-f24-13
 owner: ucsb-cs156-f24
 repo_name: team01-f24-13
-pull_requests: [{"author":{"id":"U_kgDOBtxmGw","is_bot":false,"login":"st4lemon","name":""},"headRefName":"David-MenuItemReview","number":43,"title":"Create MenuItemReview database table, MenuItemReviewController, and add GET(index), GET(show), POST, DELETE, PUT endpoints.","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/43"}]
+pull_requests: [{"author":{"id":"MDQ6VXNlcjYxNjMyNjc4","is_bot":false,"login":"emiz39","name":"Emily Z"},"headRefName":"Emily-UCSBDiningCommonsMenuItem","number":46,"title":"Create UCSBDiningCommonsMenuItem database table","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/46"},{"author":{"id":"U_kgDOBtxmGw","is_bot":false,"login":"st4lemon","name":""},"headRefName":"David-MenuItemReview","number":43,"title":"Create MenuItemReview database table, MenuItemReviewController, and add GET(index), GET(show), POST, DELETE, PUT endpoints.","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/43"}]
