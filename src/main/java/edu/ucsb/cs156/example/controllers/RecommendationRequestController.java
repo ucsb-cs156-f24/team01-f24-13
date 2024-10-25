@@ -55,9 +55,12 @@ public class RecommendationRequestController extends ApiController {
     /**
      * Create a new recommendation request
      * 
-     * @param quarterYYYYQ  the quarter in the format YYYYQ
-     * @param name          the name of the date
-     * @param localDateTime the date
+     * @param requesterEmail   the email of the requester
+     * @param professorEmail   the email of the professor
+     * @param explanation      the reason for the recommendation
+     * @param dateRequested    date the recommendation was requested
+     * @param dateNeeded       date the recommendation is needed
+     * @param done             whether the request is done
      * @return the saved recommendation request
      */
     @Operation(summary= "Create a new recommendation request")
