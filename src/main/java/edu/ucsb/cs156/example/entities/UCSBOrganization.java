@@ -9,15 +9,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.lang.annotation.Inherited;
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "ucsborganizations")
-
+@Entity(name = "ucsborganization")
 public class UCSBOrganization 
 {
     @Id
