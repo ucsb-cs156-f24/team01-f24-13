@@ -91,4 +91,16 @@ public class UCSBOrganizationController extends ApiController
 
         return org;
     }
+
+    @Operation(summary= "Delete a UCSBDiningCommons")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("")
+    public Object deleteOrganization(
+            @Parameter(name="orgCode") @RequestParam String orgCode) {
+        UCSBOrganization org = ucsbOrganizationRepository.findById(orgCode)
+                .orElseThrow(() -> new EntityNotFoundException(UCSBOrganization.class, orgCode));
+
+        ucsbOrganizationRepository.delete(org);
+        return genericMessage("UCSBOrganization with id %s deleted".formatted(orgCode));
+    }
 }
