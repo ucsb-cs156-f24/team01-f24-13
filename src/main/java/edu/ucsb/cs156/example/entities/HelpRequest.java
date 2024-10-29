@@ -1,5 +1,7 @@
 package edu.ucsb.cs156.example.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,25 +11,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
- * This is a JPA entity that represents a UCSBDate, i.e. an entry
- * that comes from the UCSB API for academic calendar dates.
+ * This is a JPA entity that represents a restaurant.
  */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "HELPREQUEST")
+@Entity(name = "HelpRequest")
 public class HelpRequest {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
- private String requesterEmail;
- private String teamId;
-private String tableOrBreakoutRoom;
-private LocalDateTime requestTime;
-private String explanation;
-private boolean solved;
+  private String requesterEmail;
+  private String teamId;
+  private String tableOrBreakoutRoom;
+  private LocalDateTime requestTime;
+  private String explanation;
+  private boolean solved;
 }
