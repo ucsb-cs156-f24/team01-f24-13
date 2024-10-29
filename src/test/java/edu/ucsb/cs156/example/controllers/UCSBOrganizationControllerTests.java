@@ -40,6 +40,8 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase
 
     @MockBean
     UserRepository userRepository;
+
+    // Original Get tests
     
     @Test
     public void logged_out_users_cannot_get_all() throws Exception {
@@ -57,7 +59,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase
     @Test
      public void logged_out_users_cannot_get_by_id() throws Exception {
 	    mockMvc.perform(get("/api/ucsborganization?orgCode=acm"))
-			    .andExpect(status().is(404)); // logged out users can't get by id
+			    .andExpect(status().is(403)); // logged out users can't get by id
      }
 
      @WithMockUser(roles = { "USER" })
@@ -97,8 +99,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase
              assertEquals(expectedJson, responseString);
      }
 
-    // Authorization tests for /api/ucsbdiningcommons/post
-    // (Perhaps should also have these for put and delete)
+    // Original Post tests
 
     @Test
     public void logged_out_users_cannot_post() throws Exception {
@@ -139,4 +140,43 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
      }
+
+     // Get endpoint for single record tests
+
+     @WithMockUser(roles = { "USER" })
+        @Test
+        public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
+
+                UCSBOrganization zpr = UCSBOrganization.builder()
+                                .orgCode("zpr")
+                                .orgTranslationShort("Zeta Phi Rho")
+                                .orgTranslation("Zeta Phi Rho")
+                                .inactive(false)
+                                .build();
+
+                when(ucsbOrganizationRepository.findById(eq("zpr"))).thenReturn(Optional.of(zpr));
+
+                MvcResult response = mockMvc.perform(get("/api/ucsborganization?orgCode=zpr"))
+                                .andExpect(status().isOk()).andReturn();
+
+                verify(ucsbOrganizationRepository, times(1)).findById(eq("zpr"));
+                String expectedJson = mapper.writeValueAsString(zpr);
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(expectedJson, responseString);
+        }
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void test_that_logged_in_user_can_get_by_id_when_the_id_does_not_exist() throws Exception {
+
+                when(ucsbOrganizationRepository.findById(eq("cdt"))).thenReturn(Optional.empty());
+
+                MvcResult response = mockMvc.perform(get("/api/ucsborganization?orgCode=cdt"))
+                                .andExpect(status().isNotFound()).andReturn();
+
+                verify(ucsbOrganizationRepository, times(1)).findById(eq("cdt"));
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("EntityNotFoundException", json.get("type"));
+                assertEquals("UCSBOrganization with id cdt not found", json.get("message"));
+        }
 }
