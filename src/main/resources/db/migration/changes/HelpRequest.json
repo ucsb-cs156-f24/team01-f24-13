@@ -21,7 +21,6 @@
         "changes": [
           {
             "createTable": {
-              "tableName": "HelpRequest",
               "columns": [
                 {
                   "column": {
@@ -54,7 +53,7 @@
                 },
                 {
                   "column": {
-                    "name": "REQUESTER_TIME",
+                    "name": "REQUEST_TIME",
                     "type": "TIMESTAMP"
                   }
                 },
@@ -70,7 +69,8 @@
                     "type": "BOOLEAN"
                   }
                 }
-              ]
+              ],
+              "tableName": "HelpRequest"
             }
           }
         ]
