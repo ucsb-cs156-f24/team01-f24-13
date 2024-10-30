@@ -4,6 +4,7 @@ import edu.ucsb.cs156.example.repositories.UserRepository;
 import edu.ucsb.cs156.example.testconfig.TestConfig;
 import edu.ucsb.cs156.example.ControllerTestCase;
 import edu.ucsb.cs156.example.entities.RecommendationRequest;
+import edu.ucsb.cs156.example.entities.UCSBDate;
 import edu.ucsb.cs156.example.repositories.RecommendationRequestRepository;
 
 import java.util.ArrayList;
@@ -58,7 +59,12 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
             mockMvc.perform(get("/api/recommendationrequests/all"))
                             .andExpect(status().is(200)); // logged
     }
-    
+
+    @Test
+        public void logged_out_users_cannot_get_by_id() throws Exception {
+                mockMvc.perform(get("/api/recommendationrequests?id=7"))
+                                .andExpect(status().is(403)); // logged out users can't get by id
+        }
 
     @WithMockUser(roles = { "USER" })
     @Test
@@ -124,7 +130,7 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
 
     @WithMockUser(roles = { "ADMIN", "USER" })
     @Test
-    public void an_admin_user_can_post_a_new_review() throws Exception {
+    public void an_admin_user_can_post_a_new_request() throws Exception {
             // arrange
 
             LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
@@ -153,4 +159,58 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
             String responseString = response.getResponse().getContentAsString();
             assertEquals(expectedJson, responseString);
     }
+
+    // tests for GET by id
+
+     @WithMockUser(roles = { "USER" })
+        @Test
+        public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
+
+                // arrange
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-01-04T00:00:00");
+
+                RecommendationRequest recommendationRequest = RecommendationRequest.builder()
+                            .requesterEmail("stevenjiang@ucsb.edu")
+                            .professorEmail("sra@ucsb.edu")
+                            .explanation("masters")
+                            .dateRequested(ldt1)
+                            .dateNeeded(ldt2)
+                            .done(true)
+                            .build();
+
+                when(recommendationRequestRepository.findById(eq(7L))).thenReturn(Optional.of(recommendationRequest));
+
+                // act
+                MvcResult response = mockMvc.perform(get("/api/recommendationrequests?id=7"))
+                                .andExpect(status().isOk()).andReturn();
+
+                // assert
+
+                verify(recommendationRequestRepository, times(1)).findById(eq(7L));
+                String expectedJson = mapper.writeValueAsString(recommendationRequest);
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(expectedJson, responseString);
+        }
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void test_that_logged_in_user_can_get_by_id_when_the_id_does_not_exist() throws Exception {
+
+                // arrange
+
+                when(recommendationRequestRepository.findById(eq(7L))).thenReturn(Optional.empty());
+
+                // act
+                MvcResult response = mockMvc.perform(get("/api/recommendationrequests?id=7"))
+                                .andExpect(status().isNotFound()).andReturn();
+
+                // assert
+
+                verify(recommendationRequestRepository, times(1)).findById(eq(7L));
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("EntityNotFoundException", json.get("type"));
+                assertEquals("RecommendationRequest with id 7 not found", json.get("message"));
+        }
+
 }
