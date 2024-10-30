@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-f24/team01-f24-13
 owner: ucsb-cs156-f24
 repo_name: team01-f24-13
-pull_requests: [{"author":{"id":"U_kgDOB3ED6g","is_bot":false,"login":"Anteater10","name":""},"headRefName":"anteater10-Articles","number":53,"title":"Update ArticlesController, Articles entity, ArticlesRepository, and A…","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/53"},{"author":{"id":"U_kgDOBtkPHg","is_bot":false,"login":"clevermonkey16","name":""},"headRefName":"Steven-RecommendationRequest","number":52,"title":"Add PUT (edit) endpoint for a single record in RecommendationRequest table","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/52"}]
+pull_requests: [{"author":{"id":"U_kgDOBtkPHg","is_bot":false,"login":"clevermonkey16","name":""},"headRefName":"Steven-RecommendationRequest","number":52,"title":"Add PUT (edit) endpoint for a single record in RecommendationRequest table","url":"https://github.com/ucsb-cs156-f24/team01-f24-13/pull/52"}]
