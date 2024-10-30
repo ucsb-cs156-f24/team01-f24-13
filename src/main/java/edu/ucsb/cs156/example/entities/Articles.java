@@ -11,11 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * This is a JPA entity that represents a UCSBDate, i.e. an entry
- * that comes from the UCSB API for academic calendar dates.
- */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,4 +26,4 @@ public class Articles {
     private String explanation;
     private String email;
     private LocalDateTime dateAdded;
-  }
+}

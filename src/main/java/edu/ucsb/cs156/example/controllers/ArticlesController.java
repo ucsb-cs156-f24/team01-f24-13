@@ -10,22 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 
 /**
- * This is a REST controller for Articles
+ * REST controller for managing articles.
  */
 
-@Tag(name = "Articles")
+@Tag(name = "articles")
 @RequestMapping("/api/articles")
 @RestController
 @Slf4j
@@ -35,27 +31,40 @@ public class ArticlesController extends ApiController {
     ArticlesRepository articlesRepository;
 
     /**
-     * List all articles
+     * List all articles.
      * 
-     * @return an iterable of Articles
+     * @return iterable of all articles
      */
     @Operation(summary = "List all articles")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
     public Iterable<Articles> allArticles() {
-        Iterable<Articles> articles = articlesRepository.findAll();
-        return articles;
+        return articlesRepository.findAll();
     }
 
     /**
-     * Create a new article
+     * Get a single article by ID.
      * 
-     * @param title       the title of the article
-     * @param url         the URL of the article
-     * @param explanation a short explanation of the article
-     * @param email       the email of the submitter
-     * @param dateAdded   the date the article was added
-     * @return the saved article
+     * @param id ID of the article to retrieve
+     * @return the requested article
+     */
+    @Operation(summary = "Get a single article by ID")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("")
+    public Articles getById(@Parameter(name = "id") @RequestParam Long id) {
+        return articlesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Articles.class, id));
+    }
+
+    /**
+     * Create a new article.
+     * 
+     * @param title       title of the article
+     * @param url         URL of the article
+     * @param explanation explanation of the article
+     * @param email       email of the article creator
+     * @param dateAdded   date the article was added
+     * @return the newly created article
      */
     @Operation(summary = "Create a new article")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -65,7 +74,7 @@ public class ArticlesController extends ApiController {
             @Parameter(name = "url") @RequestParam String url,
             @Parameter(name = "explanation") @RequestParam String explanation,
             @Parameter(name = "email") @RequestParam String email,
-            @Parameter(name = "dateAdded", description = "date added in ISO format (YYYY-MM-DDTHH:MM:SS)") @RequestParam LocalDateTime dateAdded) {
+            @Parameter(name = "dateAdded") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateAdded) {
 
         Articles article = Articles.builder()
                 .title(title)
@@ -75,8 +84,49 @@ public class ArticlesController extends ApiController {
                 .dateAdded(dateAdded)
                 .build();
 
-        Articles savedArticle = articlesRepository.save(article);
+        return articlesRepository.save(article);
+    }
 
-        return savedArticle;
+    /**
+     * Update an existing article.
+     * 
+     * @param id       ID of the article to update
+     * @param incoming article data to update with
+     * @return the updated article
+     */
+    @Operation(summary = "Update an existing article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Articles updateArticle(
+            @Parameter(name = "id") @RequestParam Long id,
+            @RequestBody @Valid Articles incoming) {
+
+        Articles article = articlesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Articles.class, id));
+
+        article.setTitle(incoming.getTitle());
+        article.setUrl(incoming.getUrl());
+        article.setExplanation(incoming.getExplanation());
+        article.setEmail(incoming.getEmail());
+        article.setDateAdded(incoming.getDateAdded());
+
+        return articlesRepository.save(article);
+    }
+
+    /**
+     * Delete an article by ID.
+     * 
+     * @param id ID of the article to delete
+     * @return confirmation message
+     */
+    @Operation(summary = "Delete an article by ID")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("")
+    public Object deleteArticle(@Parameter(name = "id") @RequestParam Long id) {
+        Articles article = articlesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Articles.class, id));
+
+        articlesRepository.delete(article);
+        return genericMessage("Article with id %s deleted".formatted(id));
     }
 }
