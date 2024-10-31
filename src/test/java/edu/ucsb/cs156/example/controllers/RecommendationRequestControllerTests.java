@@ -216,7 +216,7 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
         // tests for DELETE
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_delete_a_date() throws Exception {
+        public void admin_can_delete_a_recommendation_request() throws Exception {
                 // arrange
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
                 LocalDateTime ldt2 = LocalDateTime.parse("2022-01-04T00:00:00");
@@ -248,7 +248,7 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_tries_to_delete_non_existant_ucsbdate_and_gets_right_error_message()
+        public void admin_tries_to_delete_non_existant_recommendation_request_and_gets_right_error_message()
                         throws Exception {
                 // arrange
 
@@ -264,6 +264,93 @@ public class RecommendationRequestControllerTests extends ControllerTestCase {
                 verify(recommendationRequestRepository, times(1)).findById(15L);
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("RecommendationRequest with id 15 not found", json.get("message"));
+        }
+
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_can_edit_an_existing_recommendation_request() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-01-04T00:00:00");
+                LocalDateTime ldt3 = LocalDateTime.parse("2022-01-05T00:00:00");
+                LocalDateTime ldt4 = LocalDateTime.parse("2022-01-06T00:00:00");
+
+                RecommendationRequest recommendationRequestOrig = RecommendationRequest.builder()
+                        .requesterEmail("stevenjiang@ucsb.edu")
+                        .professorEmail("sra@ucsb.edu")
+                        .explanation("masters")
+                        .dateRequested(ldt1)
+                        .dateNeeded(ldt2)
+                        .done(false)
+                        .build();
+
+
+                RecommendationRequest recommendationRequestEdited = RecommendationRequest.builder()
+                        .requesterEmail("dqiao@ucsb.edu")
+                        .professorEmail("pconrad@ucsb.edu")
+                        .explanation("scholarship")
+                        .dateRequested(ldt3)
+                        .dateNeeded(ldt4)
+                        .done(true)
+                        .build();
+
+                String requestBody = mapper.writeValueAsString(recommendationRequestEdited);
+
+                when(recommendationRequestRepository.findById(eq(67L))).thenReturn(Optional.of(recommendationRequestOrig));
+
+                // act
+                MvcResult response = mockMvc.perform(
+                                put("/api/recommendationrequests?id=67")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .characterEncoding("utf-8")
+                                                .content(requestBody)
+                                                .with(csrf()))
+                                .andExpect(status().isOk()).andReturn();
+
+                // assert
+                verify(recommendationRequestRepository, times(1)).findById(67L);
+                verify(recommendationRequestRepository, times(1)).save(recommendationRequestEdited); // should be saved with correct user
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(requestBody, responseString);
+        }
+
+
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_cannot_edit_recommendation_request_that_does_not_exist() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-01-04T00:00:00");
+
+                RecommendationRequest editedRecommendationRequest = RecommendationRequest.builder()
+                            .requesterEmail("stevenjiang@ucsb.edu")
+                            .professorEmail("sra@ucsb.edu")
+                            .explanation("masters")
+                            .dateRequested(ldt1)
+                            .dateNeeded(ldt2)
+                            .done(true)
+                            .build();
+
+                String requestBody = mapper.writeValueAsString(editedRecommendationRequest);
+
+                when(recommendationRequestRepository.findById(eq(67L))).thenReturn(Optional.empty());
+
+                // act
+                MvcResult response = mockMvc.perform(
+                                put("/api/recommendationrequests?id=67")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .characterEncoding("utf-8")
+                                                .content(requestBody)
+                                                .with(csrf()))
+                                .andExpect(status().isNotFound()).andReturn();
+
+                // assert
+                verify(recommendationRequestRepository, times(1)).findById(67L);
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("RecommendationRequest with id 67 not found", json.get("message"));
+
         }
 
 }
