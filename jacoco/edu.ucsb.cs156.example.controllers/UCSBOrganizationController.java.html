@@ -92,7 +92,7 @@ import jakarta.validation.Valid;
 <span class="fc" id="L92">        return org;</span>
     }
 
-    @Operation(summary= &quot;Delete a UCSBDiningCommons&quot;)
+    @Operation(summary= &quot;Delete an organization&quot;)
     @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
     @DeleteMapping(&quot;&quot;)
     public Object deleteOrganization(
