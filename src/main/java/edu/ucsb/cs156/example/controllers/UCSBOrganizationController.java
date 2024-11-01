@@ -92,7 +92,7 @@ public class UCSBOrganizationController extends ApiController
         return org;
     }
 
-    @Operation(summary= "Delete a UCSBDiningCommons")
+    @Operation(summary= "Delete an organization")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("")
     public Object deleteOrganization(
